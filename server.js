@@ -8,9 +8,13 @@ const app = express();
 app.use(cors());
 
 // Данные берем из панели Supabase (Settings -> API)
+// const supabase = createClient(
+//   "https://hvxvgkkrklrkjvspouig.supabase.co",
+//   "sb_secret_pEdzRrroE0ibnioHrwWuCg_UUWjptf2",
+// );
 const supabase = createClient(
-  "https://hvxvgkkrklrkjvspouig.supabase.co",
-  "sb_secret_pEdzRrroE0ibnioHrwWuCg_UUWjptf2",
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY,
 );
 
 const multer = require("multer");
