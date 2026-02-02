@@ -64,18 +64,66 @@ app.post(
 
       if (error) throw error;
 
-      // 2. Получаем публичную ссылку
-      const { data: publicUrlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
+      //   // 2. Получаем публичную ссылку
+      //   const { data: publicUrlData } = supabase.storage
+      //     .from("avatars")
+      //     .getPublicUrl(fileName);
 
-      // 3. Отправляем ссылку обратно в приложение
+      // 2. ГЕНЕРИРУЕМ ПУБЛИЧНУЮ ССЫЛКУ (Вот этого скорее всего не хватало)
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
+      console.log("Сгенерирована ссылка:", publicUrl);
+
+      //   // 3. Отправляем ссылку обратно в приложение
+      //   res.json({
+      //     message: "Файл в облаке!",
+      //     url: publicUrlData.publicUrl,
+      //   });
+
+      // 3. Отправляем ссылку обратно в Expo
       res.json({
-        message: "Файл в облаке!",
-        url: publicUrlData.publicUrl,
+        message: "Успех!",
+        url: publicUrl, // Теперь это полная ссылка https://...
       });
     } catch (err) {
       console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  },
+);
+
+app.post(
+  "/webservice/user/uploadImage",
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const file = req.file;
+      const fileName = `${Date.now()}_${file.originalname}`;
+
+      // 1. Загружаем файл
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, file.buffer, {
+          contentType: file.mimetype,
+        });
+
+      if (error) throw error;
+
+      // 2. ГЕНЕРИРУЕМ ПУБЛИЧНУЮ ССЫЛКУ (Вот этого скорее всего не хватало)
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
+      console.log("Сгенерирована ссылка:", publicUrl);
+
+      // 3. Отправляем ссылку обратно в Expo
+      res.json({
+        message: "Успех!",
+        url: publicUrl, // Теперь это полная ссылка https://...
+      });
+    } catch (err) {
       res.status(500).json({ error: err.message });
     }
   },
@@ -98,6 +146,6 @@ app.post(
 // Запуск сервера
 const PORT = 3000; // Можно поставить 80, если порт свободен
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Сервер запущен на http://192.168.1.195:${PORT}`);
+  console.log(`🚀 Сервер запущен на порту:${PORT}`);
   console.log("Ожидаю подключение от Expo Go...");
 });
