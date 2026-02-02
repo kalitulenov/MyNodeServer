@@ -17,7 +17,7 @@ const supabase = createClient(
   process.env.SUPABASE_KEY,
 );
 
-const multer = require("multer");
+// const multer = require("multer");
 
 // Создаем папку 'uploads', если её нет
 const uploadDir = "./uploads";
